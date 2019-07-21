@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 
@@ -10,7 +12,8 @@ namespace Framework
 
 		public class Writer
 		{
-			public byte[] Buffer;
+			private byte[] _buffer;
+			public byte[] Buffer { get { return _buffer; } }
 			public int tracker;
 
 			public Writer()
@@ -30,8 +33,13 @@ namespace Framework
 
 			public void Refresh(int capacity)
 			{
-				Buffer = new byte[capacity];
+				_buffer = new byte[capacity];
 				tracker = 0;
+			}
+
+			public void SetTracker(int index)
+			{
+				tracker = index;
 			}
 
 			public unsafe byte[] CorrectBuffer()
@@ -40,7 +48,7 @@ namespace Framework
 
 				fixed (void* othPtr = &otherBuffer[0])
 				{
-					fixed (void* ptr = &Buffer[0])
+					fixed (void* ptr = &_buffer[0])
 					{
 						UnsafeUtility.MemCpy(othPtr, ptr, tracker);
 					}
@@ -57,17 +65,17 @@ namespace Framework
 				else
 					index = _index;
 
-				if (index + add + 1 < Buffer.Length)
+				if (index + add + 1 < _buffer.Length)
 					return;
 
-				var newSize = Buffer.Length + add;
+				var newSize = _buffer.Length + add;
 
-				var tempArr = Buffer;
-				Buffer = new byte[newSize];
+				var tempArr = _buffer;
+				_buffer = new byte[newSize];
 
 				fixed (void* tmpPtr = &tempArr[0])
 				{
-					fixed (void* ptr = &Buffer[0])
+					fixed (void* ptr = &_buffer[0])
 					{
 						UnsafeUtility.MemCpy(ptr, tmpPtr, tempArr.Length);
 					}
@@ -82,7 +90,7 @@ namespace Framework
 
 				EnsureSize(1, index);
 
-				Buffer[index] = _byte;
+				_buffer[index] = _byte;
 
 				if (_index <= -1)
 					tracker += 1;
@@ -99,7 +107,7 @@ namespace Framework
 
 				EnsureSize(2, index);
 
-				fixed (void* ptr = &Buffer[index])
+				fixed (void* ptr = &_buffer[index])
 					*((short*)ptr) = _short;
 
 				if (_index <= -1)
@@ -112,7 +120,7 @@ namespace Framework
 
 				EnsureSize(2, index);
 
-				fixed (void* ptr = &Buffer[index])
+				fixed (void* ptr = &_buffer[index])
 					*((ushort*)ptr) = _ushort;
 
 				if (_index <= -1)
@@ -125,7 +133,7 @@ namespace Framework
 
 				EnsureSize(4, index);
 
-				fixed (void* ptr = &Buffer[index])
+				fixed (void* ptr = &_buffer[index])
 					*((int*)ptr) = _int;
 
 				if (_index <= -1)
@@ -138,7 +146,7 @@ namespace Framework
 
 				EnsureSize(4, index);
 
-				fixed (void* ptr = &Buffer[index])
+				fixed (void* ptr = &_buffer[index])
 					*((uint*)ptr) = _uint;
 
 				if (_index <= -1)
@@ -151,8 +159,8 @@ namespace Framework
 
 				EnsureSize(4, index);
 
-				fixed (void* ptr = &Buffer[index])
-					*((float*)*(int*)&ptr) = _float;
+				fixed (void* ptr = &_buffer[index])
+					*((int*)ptr) = *(int*)&_float;
 
 				if (_index <= -1)
 					tracker += 4;
@@ -166,12 +174,12 @@ namespace Framework
 
 				EnsureSize(4 + length * 2, index);
 
-				fixed (void* ptr = &Buffer[index])
+				fixed (void* ptr = &_buffer[index])
 					*((int*)ptr) = length;
 
 				for (int i = 0; i < length; i++)
 				{
-					fixed (void* ptr = &Buffer[index + 4 + (i * 2)])
+					fixed (void* ptr = &_buffer[index + 4 + (i * 2)])
 						*((short*)ptr) = (short)_string[i];
 				}
 
@@ -190,7 +198,7 @@ namespace Framework
 
 				EnsureSize(4 + byteSize, index);
 
-				fixed (void* ptr = &Buffer[index])
+				fixed (void* ptr = &_buffer[index])
 					*((int*)ptr) = byteSize;
 
 				var _this = this;
@@ -212,10 +220,10 @@ namespace Framework
 
 				EnsureSize(4 + 4 + (byteSize * _array.Length), index);
 
-				fixed (void* ptr = &Buffer[tracker])
+				fixed (void* ptr = &_buffer[tracker])
 					*((int*)ptr) = _array.Length;
 
-				fixed (void* ptr = &Buffer[tracker + 4])
+				fixed (void* ptr = &_buffer[tracker + 4])
 					*((int*)ptr) = byteSize;
 
 				var _this = this;
@@ -235,11 +243,11 @@ namespace Framework
 
 				EnsureSize(8, index);
 
-				fixed (void* ptr = &Buffer[index])
-					*((float*)*(int*)&ptr) = _vector2.x;
+				fixed (void* ptr = &_buffer[index])
+					*((int*)ptr) = *(int*)&_vector2.x;
 
-				fixed (void* ptr = &Buffer[index + 4])
-					*((float*)*(int*)&ptr) = _vector2.y;
+				fixed (void* ptr = &_buffer[index + 4])
+					*((int*)ptr) = *(int*)&_vector2.y;
 
 
 				if (_index <= -1)
@@ -252,14 +260,14 @@ namespace Framework
 
 				EnsureSize(12, index);
 
-				fixed (void* ptr = &Buffer[index])
-					*((float*)*(int*)&ptr) = _vector3.x;
+				fixed (void* ptr = &_buffer[index])
+					*((int*)ptr) = *(int*)&_vector3.x;
 
-				fixed (void* ptr = &Buffer[index + 4])
-					*((float*)*(int*)&ptr) = _vector3.y;
+				fixed (void* ptr = &_buffer[index + 4])
+					*((int*)ptr) = *(int*)&_vector3.y;
 
-				fixed (void* ptr = &Buffer[index + 8])
-					*((float*)*(int*)&ptr) = _vector3.z;
+				fixed (void* ptr = &_buffer[index + 8])
+					*((int*)ptr) = *(int*)&_vector3.z;
 
 				if (_index <= -1)
 					tracker += 12;
@@ -268,7 +276,8 @@ namespace Framework
 
 		public class Reader
 		{
-			public byte[] Buffer;
+			private byte[] _buffer;
+			public byte[] Buffer { get { return _buffer; } }
 			int tracker;
 
 			public unsafe Reader(byte[] newBuffer)
@@ -278,15 +287,20 @@ namespace Framework
 
 			public void Refresh(byte[] newBuffer)
 			{
-				Buffer = newBuffer;
+				_buffer = newBuffer;
 				tracker = 0;
+			}
+
+			public void SetTracker(int index)
+			{
+				tracker = index;
 			}
 
 			unsafe bool TooMuch(int add, int index = -1)
 			{
 				if (index == -1)
 					index = tracker;
-				return index + add + 1 >= Buffer.Length;
+				return index + add + 1 >= _buffer.Length;
 			}
 
 			public byte ReadByte(int index)
@@ -294,7 +308,7 @@ namespace Framework
 				if (TooMuch(1))
 					return default;
 
-				return Buffer[index];
+				return _buffer[index];
 			}
 
 			public byte ReadNextByte()
@@ -326,7 +340,7 @@ namespace Framework
 
 				short value;
 
-				fixed (byte* ptr = &Buffer[index])
+				fixed (byte* ptr = &_buffer[index])
 				{
 					value = *((short*)ptr);
 				}
@@ -349,7 +363,7 @@ namespace Framework
 
 				ushort value;
 
-				fixed (byte* ptr = &Buffer[index])
+				fixed (byte* ptr = &_buffer[index])
 				{
 					value = *((ushort*)ptr);
 				}
@@ -372,7 +386,7 @@ namespace Framework
 
 				int value;
 
-				fixed (byte* ptr = &Buffer[index])
+				fixed (byte* ptr = &_buffer[index])
 				{
 					value = *((int*)ptr);
 				}
@@ -395,7 +409,7 @@ namespace Framework
 
 				uint value;
 
-				fixed (byte* ptr = &Buffer[index])
+				fixed (byte* ptr = &_buffer[index])
 				{
 					value = *((uint*)ptr);
 				}
@@ -418,7 +432,7 @@ namespace Framework
 
 				float value;
 
-				fixed (byte* ptr = &Buffer[index])
+				fixed (byte* ptr = &_buffer[index])
 				{
 					value = *(float*)&(*((int*)ptr));
 				}
@@ -441,7 +455,7 @@ namespace Framework
 
 				int length;
 
-				fixed (byte* ptr = &Buffer[index])
+				fixed (byte* ptr = &_buffer[index])
 				{
 					length = *((int*)ptr);
 				}
@@ -453,7 +467,7 @@ namespace Framework
 
 				for (int i = 0; i < length; i++)
 				{
-					fixed (byte* ptr = &Buffer[index + 4 + (i * 2)])
+					fixed (byte* ptr = &_buffer[index + 4 + (i * 2)])
 					{
 						var _short = *((short*)ptr);
 						sb.Append((char)_short);
@@ -478,7 +492,7 @@ namespace Framework
 				if (TooMuch(4))
 					return default;
 
-				fixed (byte* ptr = &Buffer[tracker])
+				fixed (byte* ptr = &_buffer[tracker])
 					byteSize = *((int*)ptr);
 
 				if (TooMuch(byteSize, tracker + 4))
@@ -508,10 +522,10 @@ namespace Framework
 
 				int length;
 
-				fixed (byte* ptr = &Buffer[tracker])
+				fixed (byte* ptr = &_buffer[tracker])
 					length = *((int*)ptr);
 
-				fixed (byte* ptr = &Buffer[tracker + 4])
+				fixed (byte* ptr = &_buffer[tracker + 4])
 					byteSize = *((int*)ptr);
 
 				if (TooMuch(length * byteSize, tracker + 8))
@@ -546,10 +560,10 @@ namespace Framework
 
 				Vector2 value = new Vector2();
 
-				fixed (byte* ptr = &Buffer[index])
+				fixed (byte* ptr = &_buffer[index])
 					value.x = *(float*)&(*((int*)ptr));
 
-				fixed (byte* ptr = &Buffer[index + 4])
+				fixed (byte* ptr = &_buffer[index + 4])
 					value.y = *(float*)&(*((int*)ptr));
 
 				return value;
@@ -570,13 +584,13 @@ namespace Framework
 
 				Vector3 value = new Vector3();
 
-				fixed (byte* ptr = &Buffer[index])
+				fixed (byte* ptr = &_buffer[index])
 					value.x = *(float*)&(*((int*)ptr));
 
-				fixed (byte* ptr = &Buffer[index + 4])
+				fixed (byte* ptr = &_buffer[index + 4])
 					value.y = *(float*)&(*((int*)ptr));
 
-				fixed (byte* ptr = &Buffer[index + 8])
+				fixed (byte* ptr = &_buffer[index + 8])
 					value.z = *(float*)&(*((int*)ptr));
 
 				return value;

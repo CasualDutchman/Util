@@ -5,6 +5,18 @@ namespace Framework
 {
 	public class SaveUtility
 	{
+		public static void Save(IByteUtilizer saveItem, string path)
+		{
+			var writer = new ByteUtility.Writer();
+			writer.Add(saveItem);
+			var bytes = writer.Buffer;
+
+			var stream = new FileStream(path, FileMode.Create);
+			stream.Write(bytes, 0, bytes.Length);
+			stream.Dispose();
+			stream.Close();
+		}
+
 		public static void Save(IByteUtilizer saveItem, string folderName, string fileName, bool overwrite = true)
 		{
 			string prefix = Application.persistentDataPath + "/";
@@ -28,6 +40,18 @@ namespace Framework
 			stream.Write(bytes, 0, bytes.Length);
 			stream.Dispose();
 			stream.Close();
+		}
+
+		public static bool Load<T>(ref T item, string path) where T : IByteUtilizer, new()
+		{
+			var stream = new FileStream(path, FileMode.Open, FileAccess.Read);
+			var length = (int)stream.Length;
+			byte[] bytes = new byte[length];
+			stream.Read(bytes, 0, length);
+
+			var reader = new ByteUtility.Reader(bytes);
+			item = reader.ReadNextItem<T>();
+			return true;
 		}
 
 		public static bool Load<T>(ref T item, string folderName, string fileName) where T : IByteUtilizer, new()
