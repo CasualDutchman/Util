@@ -65,6 +65,13 @@ public class RNG
 
 	public float Value(Vector3 v3) => Value(v3.x, v3.y, v3.z);
 
+	public int Range(int min, int max, int i)
+	{
+		var range = max - min;
+		var v = Value(i);
+		return (int)(v * range) + min;
+	}
+
 	unsafe int Int(float f)
 	{
 		return *(int*)&f;
