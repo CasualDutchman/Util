@@ -79,7 +79,7 @@ public class RNG
 
 	//Perlin
 
-	public float RidgedNoise(float x, float y, int octaves, float frequency)
+	public float RidgedNoise(float x, float y, int octaves, float frequency, out float noABS)
 	{
 		float total = 0;
 
@@ -90,7 +90,9 @@ public class RNG
 			total += perl;
 		}
 
-		return total / (float)octaves;
+		noABS = total / (float)octaves;
+
+		return Mathf.Abs(noABS);
 	}
 
 	public float PerlinNoiseOctaves(float x, float y, int octaves, float persistance, float frequency, bool noise = false, float noiseScale = 0.1f)
