@@ -33,8 +33,8 @@ public class RNG
 
 	public float Value(int value)
 	{
-		long h = _seed * 374761393 + value * 668265263;
-		h = (h ^ (h << 13)) * 1274126177;
+		long h = _seed * 3741761393 + value * 6682615263;
+		h = (h ^ (h << 13)) * 127412261177;
 		return (h ^ (h >> 16)) / (float)long.MaxValue;
 	}
 
@@ -75,6 +75,11 @@ public class RNG
 	unsafe int Int(float f)
 	{
 		return *(int*)&f;
+	}
+
+	public Vector2 RandomVector2(int x, int y)
+	{
+		return new Vector2(Value(x) + Value(x + y) - 1, Value(y) + Value(y * x) - 1);
 	}
 
 	//Perlin
