@@ -187,6 +187,24 @@ namespace Framework
 					tracker += 4 + length * 2;
 			}
 
+			public unsafe void Add(byte[] _arr, int _index = -1)
+			{
+				int index = _index <= -1 ? tracker : _index;
+
+				EnsureSize(_arr.Length, index);
+
+				fixed (void* tmpPtr = &_arr[0])
+				{
+					fixed (void* ptr = &_buffer[index])
+					{
+						UnsafeUtility.MemCpy(ptr, tmpPtr, _arr.Length);
+					}
+				}
+
+				if (_index <= -1)
+					tracker += _arr.Length;
+			}
+
 			public unsafe void Add<T>(T _item, int _index = -1) where T : IByteUtilizer
 			{
 				if (_item == null)
