@@ -221,7 +221,7 @@ namespace Framework
 
 				var _this = this;
 
-				_item.Write(ref _this, tracker + 4);
+				_item.Write(ref _this, index + 4);
 
 				if (_index <= -1)
 					tracker += 4 + byteSize;
@@ -255,6 +255,43 @@ namespace Framework
 					tracker += 4 + 4 + (byteSize * _array.Length);
 			}
 
+			public unsafe void AddUniqueArray<T>(T[] _array, int _index = -1) where T : IByteUtilizer
+			{
+				if (_array == null || _array.Length == 0)
+					return;
+
+				var arrayByteSize = _array.GetByteSize();
+
+				int index = _index <= -1 ? tracker : _index;
+
+				EnsureSize(8 + arrayByteSize + (_array.Length * 4), index);
+
+				fixed (void* ptr = &_buffer[index])
+					*((int*)ptr) = _array.Length;
+
+				fixed (void* ptr = &_buffer[index + 4])
+					*((int*)ptr) = arrayByteSize + (_array.Length * 4);
+
+				var _this = this;
+				var prevIndex = 0;
+
+				for (int i = 0; i < _array.Length; i++)
+				{
+					var item = _array[i];
+					var size = item.GetByteCount();
+
+					fixed (void* ptr = &_buffer[index + 8 + prevIndex])
+						*((int*)ptr) = size;
+
+					item.Write(ref _this, index + 8 + prevIndex + 4);
+
+					prevIndex += size + 8;
+				}
+
+				if (_index <= -1)
+					tracker += 4 + arrayByteSize + (_array.Length * 4);
+			}
+
 			public unsafe void Add(Vector2 _vector2, int _index = -1)
 			{
 				int index = _index <= -1 ? tracker : _index;
@@ -266,7 +303,6 @@ namespace Framework
 
 				fixed (void* ptr = &_buffer[index + 4])
 					*((int*)ptr) = *(int*)&_vector2.y;
-
 
 				if (_index <= -1)
 					tracker += 8;
@@ -474,9 +510,7 @@ namespace Framework
 				int length;
 
 				fixed (byte* ptr = &_buffer[index])
-				{
 					length = *((int*)ptr);
-				}
 
 				if (TooMuch(4 + length * 2))
 					return default;
@@ -540,13 +574,13 @@ namespace Framework
 
 				int length;
 
-				fixed (byte* ptr = &_buffer[tracker])
+				fixed (byte* ptr = &_buffer[index])
 					length = *((int*)ptr);
 
-				fixed (byte* ptr = &_buffer[tracker + 4])
+				fixed (byte* ptr = &_buffer[index + 4])
 					byteSize = *((int*)ptr);
 
-				if (TooMuch(length * byteSize, tracker + 8))
+				if (TooMuch(length * byteSize, index + 8))
 					return null;
 
 				T[] _arr = new T[length];
@@ -555,7 +589,7 @@ namespace Framework
 				for (int i = 0; i < length; i++)
 				{
 					_arr[i] = new T();
-					_arr[i].Read(ref _this, tracker + 8 + (i * byteSize));
+					_arr[i].Read(ref _this, index + 8 + (i * byteSize));
 				}
 
 				return _arr;
@@ -567,6 +601,42 @@ namespace Framework
 
 				if (_arr != null)
 					tracker += 8 + (_arr.Length * byteSize);
+
+				return _arr;
+			}
+
+			public unsafe T[] ReadUniqueArray<T>(int index) where T: IByteUtilizer, new()
+			{
+				if (TooMuch(8))
+					return null;
+
+				int length;
+				int totalByteSize;
+
+				fixed (byte* ptr = &_buffer[index])
+					length = *((int*)ptr);
+
+				fixed (byte* ptr = &_buffer[index + 4])
+					totalByteSize = *((int*)ptr);
+
+				if (TooMuch(totalByteSize, index + 8))
+					return null;
+
+				T[] _arr = new T[length];
+				var _this = this;
+				var prevIndex = 0;
+
+				for (int i = 0; i < length; i++)
+				{
+					var size = 0;
+					fixed (byte* ptr = &_buffer[index + 8 + prevIndex])
+						size = *((int*)ptr);
+
+					_arr[i] = new T();
+					_arr[i].Read(ref _this, index + 8 + prevIndex + 4);
+
+					prevIndex += size + 8;
+				}
 
 				return _arr;
 			}
