@@ -11,7 +11,7 @@ namespace Framework
 			if (arr == null || arr.Length == 0)
 				return 0;
 
-			return arr[0].GetByteCount();
+			return arr[0].GetByteCount() + 8;
 		}
 
 		public static int GetByteSize<T>(this T[] arr) where T : IByteUtilizer
@@ -23,11 +23,11 @@ namespace Framework
 
 			for (int i = 0; i < arr.Length; i++)
 			{
-				if(arr[i] != null)
+				if (arr[i] != null)
 					size += arr[i].GetByteCount();
 			}
 
-			return size;
+			return size + 8 + (arr.Length * 4);
 		}
 
 		public static int GetByteSize(this string str)

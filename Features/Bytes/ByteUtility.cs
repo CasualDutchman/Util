@@ -264,7 +264,7 @@ namespace Framework
 
 				int index = _index <= -1 ? tracker : _index;
 
-				EnsureSize(8 + arrayByteSize + (_array.Length * 4), index);
+				EnsureSize(arrayByteSize, index);
 
 				fixed (void* ptr = &_buffer[index])
 					*((int*)ptr) = _array.Length;
@@ -285,7 +285,7 @@ namespace Framework
 
 					item.Write(ref _this, index + 8 + prevIndex + 4);
 
-					prevIndex += size + 8;
+					prevIndex += size + 4;
 				}
 
 				if (_index <= -1)
@@ -565,6 +565,23 @@ namespace Framework
 				return _item;
 			}
 
+			public unsafe void ReadItemMB<T>(T item, int index, out int byteSize) where T : IByteUtilizerMB, new()
+			{
+				byteSize = 0;
+
+				if (TooMuch(4))
+					return;
+
+				fixed (byte* ptr = &_buffer[tracker])
+					byteSize = *((int*)ptr);
+
+				if (TooMuch(byteSize, tracker + 4))
+					return;
+
+				var _this = this;
+				item.Read(ref _this, tracker + 4);
+			}
+
 			public unsafe T[] ReadArray<T>(int index, out int byteSize) where T : IByteUtilizer, new()
 			{
 				byteSize = 0;
@@ -635,10 +652,42 @@ namespace Framework
 					_arr[i] = new T();
 					_arr[i].Read(ref _this, index + 8 + prevIndex + 4);
 
-					prevIndex += size + 8;
+					prevIndex += size + 4;
 				}
 
 				return _arr;
+			}
+
+			public unsafe void ReadUniqueArrayMB<T>(T[] items, int index) where T : IByteUtilizerMB, new()
+			{
+				if (TooMuch(8))
+					return;
+
+				int length;
+				int totalByteSize;
+
+				fixed (byte* ptr = &_buffer[index])
+					length = *((int*)ptr);
+
+				fixed (byte* ptr = &_buffer[index + 4])
+					totalByteSize = *((int*)ptr);
+
+				if (TooMuch(totalByteSize, index + 8))
+					return;
+
+				var _this = this;
+				var prevIndex = 0;
+
+				for (int i = 0; i < length; i++)
+				{
+					var size = 0;
+					fixed (byte* ptr = &_buffer[index + 8 + prevIndex])
+						size = *((int*)ptr);
+
+					items[i].Read(ref _this, index + 8 + prevIndex + 4);
+
+					prevIndex += size + 4;
+				}
 			}
 
 			public unsafe Vector2 ReadVector2(int index)
@@ -697,7 +746,12 @@ namespace Framework
 	public interface IByteUtilizer
 	{
 		int GetByteCount();
-		void Write(ref ByteUtility.Writer writer, int index);
-		void Read(ref ByteUtility.Reader reader, int index);
+		int Write(ref ByteUtility.Writer writer, int index);
+		int Read(ref ByteUtility.Reader reader, int index);
+	}
+
+	public interface IByteUtilizerMB : IByteUtilizer
+	{
+		
 	}
 }
