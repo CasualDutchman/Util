@@ -9,6 +9,9 @@ namespace Framework
 		public static Vector2 XY(this Vector3 v3)
 			=> new Vector2(v3.x, v3.y);
 
+		public static Vector3 XYO(this Vector3 v3, float f = 0)
+			=> new Vector3(v3.x, v3.y, f);
+
 		public static Vector2 XZ(this Vector3 v3)
 			=> new Vector2(v3.x, v3.z);
 
