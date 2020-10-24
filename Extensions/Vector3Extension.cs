@@ -29,5 +29,12 @@ namespace Framework
 
 		public static Vector3 Mul(this Vector3 v3a, Vector3 v3b)
 			=> new Vector3(v3a.x * v3b.x, v3a.y * v3b.y, v3a.z * v3b.z);
+
+		public static Vector3 Rotate(this Vector3 v3, Quaternion rot, Vector3 pivot)
+		{
+			var dir = v3 - pivot;
+			dir = rot * dir;
+			return dir + pivot;
+		}
 	}
 }
