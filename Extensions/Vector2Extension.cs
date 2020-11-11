@@ -6,8 +6,8 @@ namespace Framework
 {
 	public static class Vector2Extension
 	{
-		public static Vector3 XOY(this Vector2 v2)
-			=> new Vector3(v2.x, 0, v2.y);
+		public static Vector3 XOY(this Vector2 v2, float y = 0)
+			=> new Vector3(v2.x, y, v2.y);
 
 		public static Vector3 XYO(this Vector2 v2)
 			=> new Vector3(v2.x, v2.y, 0);

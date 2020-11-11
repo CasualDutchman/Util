@@ -2,10 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class ArrayExtension
+namespace Framework
 {
-    public static T GetRandom<T>(this T[] arr)
+	public static class ArrayExtension
 	{
-		return arr[Random.Range(0, arr.Length)];
+		public static T GetRandom<T>(this T[] arr)
+		{
+			return arr[Random.Range(0, arr.Length)];
+		}
+
+		public static T GetRandom<T>(this T[] arr, RNG rng)
+		{
+			return arr[Mathf.Clamp((int)(rng.Next() * arr.Length), 0, arr.Length)];
+		}
 	}
 }

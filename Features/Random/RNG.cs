@@ -23,6 +23,7 @@ namespace Framework
 		int[] p;
 
 		int _seed;
+		int _next;
 
 		public RNG(int seed)
 		{
@@ -31,6 +32,25 @@ namespace Framework
 			p = new int[512];
 			for (int i = 0; i < 256; i++)
 				p[256 + i] = p[i] = perlinPermutations[i];
+		}
+
+		public float Next()
+		{
+			var random = Value(_next);
+			_next++;
+			return random;
+		}
+
+		public float Range(float min, float max)
+		{
+			var random = Next();
+			return min + (max - min) * random;
+		}
+
+		public int Range(int min, int max)
+		{
+			var random = Next();
+			return Mathf.FloorToInt(min + (max - min) * random);
 		}
 
 		public float Value(int value)
@@ -82,6 +102,11 @@ namespace Framework
 		public Vector2 RandomVector2(int x, int y)
 		{
 			return new Vector2(Value(x) + Value(x + y) - 1, Value(y) + Value(y * x) - 1);
+		}
+
+		public Vector2 InsideCircle()
+		{
+			return new Vector2(Next() + Next() - 1, Next() + Next() - 1).normalized * 0.5f;
 		}
 
 		//Perlin
