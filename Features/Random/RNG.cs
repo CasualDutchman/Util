@@ -50,7 +50,7 @@ namespace Framework
 		public int Range(int min, int max)
 		{
 			var random = Next();
-			return Mathf.FloorToInt(min + (max - min) * random);
+			return (int)(min + (max - min) * random);
 		}
 
 		public float Value(int value)
@@ -106,7 +106,7 @@ namespace Framework
 
 		public Vector2 InsideCircle()
 		{
-			return new Vector2(Next() + Next() - 1, Next() + Next() - 1).normalized * 0.5f;
+			return new Vector2(Next() * 2 - 1, Next() * 2 - 1).normalized * 0.5f;
 		}
 
 		//Perlin

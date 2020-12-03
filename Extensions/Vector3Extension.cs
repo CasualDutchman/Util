@@ -33,8 +33,7 @@ namespace Framework
 		public static Vector3 Rotate(this Vector3 v3, Quaternion rot, Vector3 pivot)
 		{
 			var dir = v3 - pivot;
-			dir = rot * dir;
-			return dir + pivot;
+			return rot * dir + pivot;
 		}
 	}
 }
