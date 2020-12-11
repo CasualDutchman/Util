@@ -53,6 +53,12 @@ namespace Framework
 			return (int)(min + (max - min) * random);
 		}
 
+		public float Range(Vector2 value)
+		{
+			var random = Next();
+			return value.x + (value.y - value.x) * random;
+		}
+
 		public float Value(int value)
 		{
 			long h = _seed * 3741761393 + value * 6682615263;
