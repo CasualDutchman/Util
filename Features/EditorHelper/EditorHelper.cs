@@ -11,6 +11,26 @@ namespace Framework
 {
 	public class EditorHelper
 	{
+		public static void MinMaxSlider(SerializedProperty prop, float min = 0f, float max = 1f)
+		{
+			var minmax = prop.vector2Value;
+			prop.vector2Value = MinMaxSlider(prop.name, minmax, min, max);
+		}
+
+		public static Vector2 MinMaxSlider(string name, Vector2 v2, float min = 0f, float max = 1f)
+		{
+			var x = v2.x;
+			var y = v2.y;
+			EditorGUILayout.MinMaxSlider(name, ref x, ref y, min, max);
+
+			var nextRect = EditorGUILayout.GetControlRect();
+			nextRect = EditorGUI.PrefixLabel(nextRect, new GUIContent(" "));
+			x = EditorGUI.FloatField(new Rect(nextRect.x, nextRect.y, 60, nextRect.height), x);
+			y = EditorGUI.FloatField(new Rect(nextRect.x + nextRect.width - 60, nextRect.y, 60, nextRect.height), y);
+
+			return new Vector2(x, y);
+		}
+
 		public static void Seperator(string text, float verticalMargin = 10f, float labelMargin = 7f)
 		{
 			var content = new GUIContent(text);
