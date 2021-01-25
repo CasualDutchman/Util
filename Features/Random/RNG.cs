@@ -115,6 +115,11 @@ namespace Framework
 			return new Vector2(Next() * 2 - 1, Next() * 2 - 1).normalized * 0.5f;
 		}
 
+		public Vector3 InsideSphere()
+		{
+			return new Vector3(Next() * 2 - 1, Next() * 2 - 1, Next() * 2 - 1).normalized;
+		}
+
 		//Perlin
 
 		public float RidgedNoise(float x, float y, int octaves, float frequency, out float noABS)

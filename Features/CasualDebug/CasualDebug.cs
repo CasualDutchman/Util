@@ -57,5 +57,32 @@ namespace Framework
 				previous = pos;
 			}
 		}
+
+		public static void Cylinder(Vector3 position, float radius, float height, int quality = 20)
+			=> Cylinder(position, radius, height, quality, defaultColor);
+
+		public static void Cylinder(Vector3 position, float radius, float height, int quality, Color color)
+		{
+			var previous = Vector3.zero;
+			for (var theta = 0.0f;
+				theta <= Mathf.PI * 2.0f * (quality + 1) / quality;
+				theta += Mathf.PI * 2.0f / quality)
+			{
+				var x = radius * Mathf.Cos(theta);
+				var y = radius * Mathf.Sin(theta);
+
+				var pos = position + Vector3.right * x + Vector3.forward * y;
+				if (theta > float.Epsilon)
+				{
+					var up = new Vector3(0, height, 0);
+
+					Debug.DrawLine(previous, pos, color);
+					Debug.DrawLine(previous + up, pos + up, color);
+					Debug.DrawLine(previous, previous + up, color);
+				}
+
+				previous = pos;
+			}
+		}
 	}
 }

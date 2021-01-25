@@ -25,5 +25,10 @@ namespace Framework
 			list[index1] = list[index];
 			list[index] = item;
 		}
+
+		public static T GetRandom<T>(this List<T> list, RNG rng)
+		{
+			return list[Mathf.Clamp((int)(rng.Next() * list.Count), 0, list.Count)];
+		}
 	}
 }
