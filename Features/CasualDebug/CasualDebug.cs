@@ -30,6 +30,15 @@ namespace Framework
 			Debug.DrawRay(position - new Vector3(0, 0, half), new Vector3(0, 0, size), color);
 		}
 
+		public static void Cross(Vector3 position, float size, Color color, float time)
+		{
+			var half = size * 0.5f;
+
+			Debug.DrawRay(position - new Vector3(half, 0, 0), new Vector3(size, 0, 0), color, time);
+			Debug.DrawRay(position - new Vector3(0, half, 0), new Vector3(0, size, 0), color, time);
+			Debug.DrawRay(position - new Vector3(0, 0, half), new Vector3(0, 0, size), color, time);
+		}
+
 		public static void Arrows(Vector3 position, float size = 1f)
 		{
 			Debug.DrawRay(position, new Vector3(size, 0, 0), Color.red);
