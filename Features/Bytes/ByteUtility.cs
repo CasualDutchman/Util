@@ -622,21 +622,22 @@ namespace Framework
 				return _arr;
 			}
 
-			public unsafe T[] ReadUniqueArray<T>(int index) where T: IByteUtilizer, new()
+			public unsafe T[] ReadUniqueArray<T>(int index, out int byteSize) where T: IByteUtilizer, new()
 			{
+				byteSize = 0;
+				
 				if (TooMuch(8))
 					return null;
 
 				int length;
-				int totalByteSize;
 
 				fixed (byte* ptr = &_buffer[index])
 					length = *((int*)ptr);
 
 				fixed (byte* ptr = &_buffer[index + 4])
-					totalByteSize = *((int*)ptr);
+					byteSize = *((int*)ptr);
 
-				if (TooMuch(totalByteSize, index + 8))
+				if (TooMuch(byteSize, index + 8))
 					return null;
 
 				T[] _arr = new T[length];

@@ -25,7 +25,7 @@ namespace Framework
 
 			if (!overwrite && File.Exists(filePath))
 			{
-				Debug.LogError("[overwrite: false] File exists! Did not attempt to overwrite");
+				//Debug.LogError("[overwrite: false] File exists! Did not attempt to overwrite");
 				return;
 			}
 
@@ -62,7 +62,7 @@ namespace Framework
 
 			if (!File.Exists(filePath))
 			{
-				Debug.LogError($"File at [{filePath}] does not exist!");
+				//Debug.LogError($"File at [{filePath}] does not exist!");
 				return false;
 			}
 
